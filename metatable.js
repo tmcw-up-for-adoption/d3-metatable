@@ -1,5 +1,5 @@
 function metatable() {
-    var event = d3.dispatch('change');
+    var event = d3.dispatch('change', 'rowfocus');
 
     function table(selection) {
         selection.each(function(d) {
@@ -15,25 +15,32 @@ function metatable() {
 
             var keys = keyset.values();
 
-            bootstrap();
-            paint();
+            var bootstrap = function() {
 
-            function bootstrap() {
-                var controls = sel.selectAll('.controls').data([d]).enter().append('div').attr('class', 'controls');
+                var controls = sel.selectAll('.controls')
+                    .data([d])
+                    .enter()
+                    .append('div')
+                    .attr('class', 'controls');
+
                 controls.append('button')
                     .text('new column')
                     .on('click', function() {
                         var name = prompt('column name');
-                        keys.push(name);
+                        keyset.add(name);
+                        keys = keyset.values();
+                        console.log(keys);
                         paint();
                     });
+
                 var enter = sel.selectAll('table').data([d]).enter().append('table');
                 var thead = enter.append('thead');
                 var tbody = enter.append('tbody');
                 var tr = thead.append('tr');
 
                 table = sel.select('table');
-            }
+
+            };
 
             function paint() {
 
@@ -41,11 +48,13 @@ function metatable() {
                     .select('thead')
                     .select('tr')
                     .selectAll('th')
-                    .data(keys);
+                    .data(keys, function(d) { return d; });
 
                 th.enter()
                     .append('th')
                     .text(String);
+
+                th.exit().remove();
 
                 var tr = table.select('tbody').selectAll('tr')
                     .data(function(d) { return d; });
@@ -58,10 +67,17 @@ function metatable() {
                 var td = tr.selectAll('td')
                     .data(keys);
 
+                td.exit().remove();
+
                 td.enter()
                     .append('td')
                     .append('input')
                     .attr('field', String);
+
+                function write(d) {
+                    d[d3.select(this).attr('field')] = this.value;
+                    event.change();
+                }
 
                 tr.selectAll('input')
                     .data(function(d) {
@@ -71,13 +87,22 @@ function metatable() {
                         return d[d3.select(this).attr('field')] === undefined;
                     })
                     .property('value', function(d) {
-                        return d[d3.select(this).attr('field')];
+                        return d[d3.select(this).attr('field')] || '';
                     })
+                    .on('keyup', write)
+                    .on('change', write)
                     .on('click', function(d) {
-                        d[d3.select(this).attr('field')] = '';
-                        paint();
+                        if (d[d3.select(this).attr('field')] === undefined) {
+                            d[d3.select(this).attr('field')] = '';
+                            paint();
+                        }
+                    })
+                    .on('focus', function(d) {
+                        event.rowfocus(d);
                     });
             }
+            bootstrap();
+            paint();
         });
     }
 

@@ -10,9 +10,16 @@
         .disabled {
             background:#eee;
         }
+        body {
+            max-width:960px;
+            margin:20px auto;
+        }
         </style>
     </head>
     <body>
+        <h1>metatable</h1>
+        <p>a table interface for heterogeneous JSON collections.</p>
+        <textarea id='json'></textarea>
         <div id='table'>
         </div>
         <script src='js/d3.v3.min.js'></script>
@@ -38,7 +45,16 @@
                 });
             }
         }
-        d3.select('#table').data([data]).call(metatable());
+        d3.select('#json')
+            .property('value', JSON.stringify(data, null, 2))
+            .on('keyup', function() {
+                data = JSON.parse(this.value);
+                d3.select('#table').data([data]).call(metatable());
+            });
+            d3.select('#table').data([data]).call(metatable().on('change', function() {
+                d3.select('#json')
+                    .property('value', JSON.stringify(data, null, 2));
+            }));
         </script>
     </body>
 </html>
