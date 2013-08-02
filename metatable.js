@@ -19,21 +19,34 @@ function metatable() {
             paint();
 
             function bootstrap() {
+                var controls = sel.selectAll('.controls').data([d]).enter().append('div').attr('class', 'controls');
+                controls.append('button')
+                    .text('new column')
+                    .on('click', function() {
+                        var name = prompt('column name');
+                        keys.push(name);
+                        paint();
+                    });
                 var enter = sel.selectAll('table').data([d]).enter().append('table');
                 var thead = enter.append('thead');
                 var tbody = enter.append('tbody');
                 var tr = thead.append('tr');
 
-                tr.selectAll('th')
-                    .data(keys)
-                    .enter()
-                    .append('th')
-                    .text(String);
-
                 table = sel.select('table');
             }
 
             function paint() {
+
+                var th = table
+                    .select('thead')
+                    .select('tr')
+                    .selectAll('th')
+                    .data(keys);
+
+                th.enter()
+                    .append('th')
+                    .text(String);
+
                 var tr = table.select('tbody').selectAll('tr')
                     .data(function(d) { return d; });
 
