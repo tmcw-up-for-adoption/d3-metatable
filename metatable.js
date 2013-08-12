@@ -15,32 +15,28 @@ function metatable() {
 
             var keys = keyset.values();
 
-            var bootstrap = function() {
+            bootstrap();
+            paint();
 
-                var controls = sel.selectAll('.controls')
-                    .data([d])
-                    .enter()
-                    .append('div')
-                    .attr('class', 'controls');
-
-                controls.append('button')
-                    .text('new column')
+            function bootstrap() {
+                var controls = sel.selectAll('.controls').data([d]).enter().append('div').attr('class', 'controls');
+                var colbutton = controls.append('button')
                     .on('click', function() {
                         var name = prompt('column name');
-                        keyset.add(name);
-                        keys = keyset.values();
-                        console.log(keys);
-                        paint();
+                        if (name) {
+                            keys.push(name);
+                            paint();
+                        }
                     });
-
+                colbutton.append('span').attr('class', 'icon-plus');
+                colbutton.append('span').text(' new column');
                 var enter = sel.selectAll('table').data([d]).enter().append('table');
                 var thead = enter.append('thead');
                 var tbody = enter.append('tbody');
                 var tr = thead.append('tr');
 
                 table = sel.select('table');
-
-            };
+            }
 
             function paint() {
 
@@ -48,7 +44,7 @@ function metatable() {
                     .select('thead')
                     .select('tr')
                     .selectAll('th')
-                    .data(keys, function(d) { return d; });
+                    .data(keys);
 
                 th.enter()
                     .append('th')
@@ -66,8 +62,6 @@ function metatable() {
 
                 var td = tr.selectAll('td')
                     .data(keys);
-
-                td.exit().remove();
 
                 td.enter()
                     .append('td')
@@ -101,8 +95,6 @@ function metatable() {
                         event.rowfocus(d);
                     });
             }
-            bootstrap();
-            paint();
         });
     }
 
