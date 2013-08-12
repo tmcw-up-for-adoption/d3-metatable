@@ -1,0 +1,24 @@
+{
+  "name": "d3-metatable",
+  "version": "0.0.0",
+  "description": "a table element for heterogenous objects",
+  "main": "metatable.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tmcw/d3-metatable.git"
+  },
+  "keywords": [
+    "table",
+    "d3",
+    "component",
+    "client"
+  ],
+  "author": "Tom MacWright",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/tmcw/d3-metatable/issues"
+  }
+}

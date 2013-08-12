@@ -1,3 +1,9 @@
+if (typeof module !== 'undefined') {
+    module.exports = function(d3) {
+        return metatable;
+    };
+}
+
 function metatable() {
     var event = d3.dispatch('change', 'rowfocus');
 
@@ -19,7 +25,13 @@ function metatable() {
             paint();
 
             function bootstrap() {
-                var controls = sel.selectAll('.controls').data([d]).enter().append('div').attr('class', 'controls');
+
+                var controls = sel.selectAll('.controls')
+                    .data([d])
+                    .enter()
+                    .append('div')
+                    .attr('class', 'controls');
+
                 var colbutton = controls.append('button')
                     .on('click', function() {
                         var name = prompt('column name');
