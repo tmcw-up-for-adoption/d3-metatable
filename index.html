@@ -54,6 +54,8 @@
             d3.select('#table').data([data]).call(metatable().on('change', function() {
                 d3.select('#json')
                     .property('value', JSON.stringify(data, null, 2));
+            }).on('rowfocus', function(d, i) {
+              console.log(d, i);
             }));
         </script>
     </body>

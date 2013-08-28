@@ -81,30 +81,35 @@ function metatable() {
                     .attr('field', String);
 
                 function write(d) {
-                    d[d3.select(this).attr('field')] = this.value;
+                    d.data[d3.select(this).attr('field')] = this.value;
                     event.change();
                 }
 
                 tr.selectAll('input')
-                    .data(function(d) {
-                        return d3.range(keys.length).map(function() { return d; });
+                    .data(function(d, i) {
+                        return d3.range(keys.length).map(function() {
+                            return {
+                                data: d,
+                                index: i
+                            };
+                        });
                     })
                     .classed('disabled', function(d) {
-                        return d[d3.select(this).attr('field')] === undefined;
+                        return d.data[d3.select(this).attr('field')] === undefined;
                     })
                     .property('value', function(d) {
-                        return d[d3.select(this).attr('field')] || '';
+                        return d.data[d3.select(this).attr('field')] || '';
                     })
                     .on('keyup', write)
                     .on('change', write)
                     .on('click', function(d) {
-                        if (d[d3.select(this).attr('field')] === undefined) {
-                            d[d3.select(this).attr('field')] = '';
+                        if (d.data[d3.select(this).attr('field')] === undefined) {
+                            d.data[d3.select(this).attr('field')] = '';
                             paint();
                         }
                     })
                     .on('focus', function(d) {
-                        event.rowfocus(d);
+                        event.rowfocus(d.data, d.index);
                     });
             }
         });
