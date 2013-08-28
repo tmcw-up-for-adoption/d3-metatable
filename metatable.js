@@ -82,7 +82,7 @@ function metatable() {
 
                 function write(d) {
                     d.data[d3.select(this).attr('field')] = this.value;
-                    event.change();
+                    event.change(d.data, d.index);
                 }
 
                 tr.selectAll('input')
