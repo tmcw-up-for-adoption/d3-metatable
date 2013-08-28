@@ -10,10 +10,10 @@ container.append('div')
     .data([props])
     .call(
         metatable()
-            .on('change', function() {
+            .on('change', function(d, i) {
                 // a row's data is changed
             })
-            .on('rowfocus', function(d) {
+            .on('rowfocus', function(d, i) {
                 // a row is focused
             })
 ```
@@ -27,5 +27,5 @@ metatable()
 A behavior that expects to be called with a selection an array of objects
 of data. Emits events:
 
-* rowfocus: a row is focused. returns the object
-* change: a row is changed. returns the object
+* rowfocus: a row is focused. returns the object and the index
+* change: a row is changed. returns the object and the index
