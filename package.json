@@ -1,6 +1,6 @@
 {
   "name": "d3-metatable",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "a table element for heterogenous objects",
   "main": "metatable.js",
   "scripts": {
