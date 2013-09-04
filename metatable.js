@@ -19,8 +19,6 @@ function metatable() {
                 });
             });
 
-            var keys = keyset.values();
-
             bootstrap();
             paint();
 
@@ -36,12 +34,13 @@ function metatable() {
                     .on('click', function() {
                         var name = prompt('column name');
                         if (name) {
-                            keys.push(name);
+                            keyset.add(name);
                             paint();
                         }
                     });
                 colbutton.append('span').attr('class', 'icon-plus');
                 colbutton.append('span').text(' new column');
+
                 var enter = sel.selectAll('table').data([d]).enter().append('table');
                 var thead = enter.append('thead');
                 var tbody = enter.append('tbody');
@@ -52,15 +51,18 @@ function metatable() {
 
             function paint() {
 
+                var keys = keyset.values();
+
                 var th = table
                     .select('thead')
                     .select('tr')
                     .selectAll('th')
-                    .data(keys);
+                    .data(keys, function(d) { return d; });
 
-                th.enter()
-                    .append('th')
-                    .text(String);
+                var delbutton = th.enter().append('th')
+                    .append('span')
+                    .text(String)
+                    .append('button');
 
                 th.exit().remove();
 
@@ -73,12 +75,39 @@ function metatable() {
                 tr.exit().remove();
 
                 var td = tr.selectAll('td')
-                    .data(keys);
+                    .data(keys, function(d) { return d; });
 
                 td.enter()
                     .append('td')
                     .append('input')
                     .attr('field', String);
+
+                td.exit().remove();
+
+                delbutton.on('click', function(d) {
+                        var name = d;
+                        if (confirm('Delete column ' + name + '?')) {
+                            keyset.remove(name);
+                            tr.selectAll('input')
+                                .data(function(d, i) {
+                                    var map = d3.map(d);
+                                    map.remove(name);
+                                    var reduced = map.entries()
+                                        .reduce(function(memo, d) {
+                                            memo[d.key] = d.value;
+                                            return memo;
+                                        }, {});
+                                    event.change(reduced, i);
+                                    return {
+                                        data: reduced,
+                                        index: i
+                                    };
+                                });
+                            paint();
+                        }
+                    });
+                delbutton.append('span').attr('class', 'icon-minus');
+                delbutton.append('span').text(' delete');
 
                 function write(d) {
                     d.data[d3.select(this).attr('field')] = this.value;
