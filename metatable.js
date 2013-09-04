@@ -70,7 +70,7 @@ function metatable() {
                     .data(function(d) { return d; });
 
                 tr.enter()
-                  .append('tr');
+                    .append('tr');
 
                 tr.exit().remove();
 
