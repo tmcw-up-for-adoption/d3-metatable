@@ -5,7 +5,7 @@ if (typeof module !== 'undefined') {
 }
 
 function metatable() {
-    var event = d3.dispatch('change', 'rowfocus');
+    var event = d3.dispatch('blur', 'change', 'rowfocus');
 
     function table(selection) {
         selection.each(function(d) {
@@ -139,6 +139,10 @@ function metatable() {
                     })
                     .on('focus', function(d) {
                         event.rowfocus(d.data, d.index);
+                    })
+                    .on('blur', function(d, i) {
+                        var column = keys[i];
+                        event.blur(d.data[column], d3.select(this).node());
                     });
             }
         });
