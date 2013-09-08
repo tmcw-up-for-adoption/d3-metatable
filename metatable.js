@@ -92,11 +92,7 @@ function metatable() {
                                 .data(function(d, i) {
                                     var map = d3.map(d);
                                     map.remove(name);
-                                    var reduced = map.entries()
-                                        .reduce(function(memo, d) {
-                                            memo[d.key] = d.value;
-                                            return memo;
-                                        }, {});
+                                    var reduced = mapToObject(map);
                                     event.change(reduced, i);
                                     return {
                                         data: reduced,
@@ -110,15 +106,26 @@ function metatable() {
                 delbutton.append('span').text(' delete');
 
                 function write(d) {
-                    d.data[d3.select(this).attr('field')] = this.value;
+                    d.data[d3.select(this).attr('field')] =
+                        isNaN(this.value) ? this.value : Number(this.value);
                     event.change(d.data, d.index);
+                }
+
+                function mapToObject(map) {
+                    return map.entries()
+                        .reduce(function(memo, d) {
+                            memo[d.key] = isNaN(d.value) ? d.value : Number(d.value);
+                            return memo;
+                        }, {});
                 }
 
                 tr.selectAll('input')
                     .data(function(d, i) {
+                        var reduced = mapToObject(d3.map(d));
+                            
                         return d3.range(keys.length).map(function() {
                             return {
-                                data: d,
+                                data: reduced,
                                 index: i
                             };
                         });
