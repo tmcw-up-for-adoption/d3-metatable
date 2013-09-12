@@ -114,7 +114,8 @@ function metatable() {
                 function mapToObject(map) {
                     return map.entries()
                         .reduce(function(memo, d) {
-                            memo[d.key] = isNaN(d.value) ? d.value : Number(d.value);
+                            memo[d.key] = !isNaN(parseFloat(d.value)) &&
+                               /^(?!0.)/.test(d.value) ? Number(d.value) : d.value;
                             return memo;
                         }, {});
                 }
