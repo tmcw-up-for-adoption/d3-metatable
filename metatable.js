@@ -105,11 +105,12 @@ function metatable() {
                 delbutton.append('span').attr('class', 'icon-minus');
                 delbutton.append('span').text(' delete');
 
-                function coerceNum(value) {
-                    return !isNaN(parseFloat(value)) && /^(?!0.)/.test(value) ?
-                        Number(value) : value;
+                function coerceNum(x) {
+                    var fl = parseFloat(x);
+                    if (fl.toString() === x) return fl;
+                    else return x;
                 }
-                
+
                 function write(d) {
                     d.data[d3.select(this).attr('field')] = coerceNum(this.value);
                     event.change(d.data, d.index);
