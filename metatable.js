@@ -28,18 +28,20 @@ function metatable() {
                     .data([d])
                     .enter()
                     .append('div')
-                    .attr('class', 'controls');
+                    .attr('class', 'controls space-bottom');
 
-                var colbutton = controls.append('button')
+                var colbutton = controls.append('a')
+                    .text('New column')
+                    .attr('href', '#')
+                    .attr('class', 'button icon plus')
                     .on('click', function() {
+                        d3.event.preventDefault();
                         var name = prompt('column name');
                         if (name) {
                             keyset.add(name);
                             paint();
                         }
                     });
-                colbutton.append('span').attr('class', 'icon-plus');
-                colbutton.append('span').text(' new column');
 
                 var enter = sel.selectAll('table').data([d]).enter().append('table');
                 var thead = enter.append('thead');
@@ -59,22 +61,32 @@ function metatable() {
                     .selectAll('th')
                     .data(keys, function(d) { return d; });
 
-                var thEnter = th.enter().append('th');
-
-                thEnter.append('span')
+                var thEnter = th.enter()
+                    .append('th')
                     .text(String);
 
-                var delbutton = thEnter.append('button'),
-                    renamebutton = thEnter.append('button');
+                var actionLinks = thEnter
+                    .append('div')
+                    .attr('class', 'small');
+
+                var delbutton = actionLinks
+                    .append('a')
+                    .attr('href', '#')
+                    .attr('class', 'icon trash')
+                    .text('Delete');
+
+                var renamebutton = actionLinks
+                    .append('a')
+                    .attr('href', '#')
+                    .attr('class', 'icon pencil')
+                    .text('Rename');
 
                 th.exit().remove();
 
                 var tr = table.select('tbody').selectAll('tr')
                     .data(function(d) { return d; });
 
-                tr.enter()
-                    .append('tr');
-
+                tr.enter().append('tr');
                 tr.exit().remove();
 
                 var td = tr.selectAll('td')
@@ -83,18 +95,16 @@ function metatable() {
                 td.enter()
                     .append('td')
                     .append('input')
+                    .attr('type', 'text')
                     .attr('field', String);
 
                 td.exit().remove();
 
                 delbutton.on('click', deleteClick);
-                delbutton.append('span').attr('class', 'icon-minus');
-                delbutton.append('span').text(' delete');
-
-                renamebutton.append('span').text(' rename');
                 renamebutton.on('click', renameClick);
 
                 function deleteClick(d) {
+                    d3.event.preventDefault();
                     var name = d;
                     if (confirm('Delete column ' + name + '?')) {
                         keyset.remove(name);
@@ -114,6 +124,7 @@ function metatable() {
                 }
 
                 function renameClick(d) {
+                    d3.event.preventDefault();
                     var name = d;
                     var newname = prompt('New name for column ' + name + '?');
                     if (newname) {
