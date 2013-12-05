@@ -48,7 +48,21 @@
           data[i] = d;
           d3.select('#json')
               .property('value', JSON.stringify(data, null, 2));
-      }).on('rowfocus', function(d, i) {}));
+            }).on('rowfocus', function(d, i) {}).on('renameprompt', function(d, okRename) {
+
+                // Listening to `renameprompt`, you
+                // can pass in your own value submit flow.
+                this.preventprompt('rename');
+                var newname = prompt('Rename column to:');
+                if (newname) okRename(newname, d);
+
+              }).on('deleteprompt', function(d, okDelete) {
+
+                // Listening to `deleteprompt`, you
+                // can pass in your own confirmation flow.
+                this.preventprompt('delete');
+                if (confirm('Are you sure you want to delete ' + d + '?')) okDelete(d);
+            }));
   </script>
 </body>
 </html>

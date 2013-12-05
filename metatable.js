@@ -5,7 +5,8 @@ if (typeof module !== 'undefined') {
 }
 
 function metatable() {
-    var event = d3.dispatch('change', 'rowfocus');
+    var event = d3.dispatch('change', 'rowfocus', 'renameprompt', 'deleteprompt', 'preventprompt');
+    var _renamePrompt, _deletePrompt;
 
     function table(selection) {
         selection.each(function(d) {
@@ -21,6 +22,17 @@ function metatable() {
 
             bootstrap();
             paint();
+
+            event.preventprompt = function(which) {
+                switch(which) {
+                    case 'rename':
+                        _renamePrompt = true;
+                    break;
+                    case 'delete':
+                        _deletePrompt = true;
+                    break;
+                }
+            };
 
             function bootstrap() {
 
@@ -106,44 +118,58 @@ function metatable() {
                 function deleteClick(d) {
                     d3.event.preventDefault();
                     var name = d;
-                    if (confirm('Delete column ' + name + '?')) {
-                        keyset.remove(name);
-                        tr.selectAll('input')
-                            .data(function(d, i) {
-                                var map = d3.map(d);
-                                map.remove(name);
-                                var reduced = mapToObject(map);
-                                event.change(reduced, i);
-                                return {
-                                    data: reduced,
-                                    index: i
-                                };
-                            });
-                        paint();
+                    event.deleteprompt(d, completeDelete);
+                    if (_deletePrompt || confirm('Delete column ' + name + '?')) {
+                        completeDelete(d);
                     }
+                }
+
+                function completeDelete(name) {
+                    keyset.remove(name);
+                    tr.selectAll('input')
+                        .data(function(d, i) {
+                            var map = d3.map(d);
+                            map.remove(name);
+                            var reduced = mapToObject(map);
+                            event.change(reduced, i);
+                            return {
+                                data: reduced,
+                                index: i
+                            };
+                        });
+                    paint();
                 }
 
                 function renameClick(d) {
                     d3.event.preventDefault();
                     var name = d;
-                    var newname = prompt('New name for column ' + name + '?');
-                    if (newname) {
-                        keyset.remove(name);
-                        keyset.add(newname);
-                        tr.selectAll('input')
-                            .data(function(d, i) {
-                                var map = d3.map(d);
-                                map.set(newname, map.get(name));
-                                map.remove(name);
-                                var reduced = mapToObject(map);
-                                event.change(reduced, i);
-                                return {
-                                    data: reduced,
-                                    index: i
-                                };
-                            });
-                        paint();
+                    event.renameprompt(d, completeRename);
+
+                    var newname = (_renamePrompt) ?
+                        undefined :
+                        prompt('New name for column ' + name + '?');
+
+                    if (_renamePrompt || newname) {
+                        completeRename(newname, name);
                     }
+                }
+
+                function completeRename(value, name) {
+                    keyset.add(value);
+                    keyset.remove(name);
+                    tr.selectAll('input')
+                        .data(function(d, i) {
+                            var map = d3.map(d);
+                            map.set(value, map.get(name));
+                            map.remove(name);
+                            var reduced = mapToObject(map);
+                            event.change(reduced, i);
+                            return {
+                                data: reduced,
+                                index: i
+                            };
+                        });
+                    paint();
                 }
 
                 function coerceNum(x) {
