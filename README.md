@@ -27,5 +27,31 @@ metatable()
 A behavior that expects to be called with a selection an array of objects
 of data. Emits events:
 
-* rowfocus: a row is focused. returns the object and the index
-* change: a row is changed. returns the object and the index
+* `change`: a row is changed. returns the object and the index
+* `rowfocus`: a row is focused. returns the object and the index
+* `renameprompt`: Column is about to be renamed. Useful for passing in a custom workflow for submitting a value that overrides the default. usage:
+
+``` js
+.on('renameprompt', function(d, process) {
+    // Prevent the default prompt.
+    this.preventprompt('rename');
+
+    // Do it your own way
+    var newname = prompt('Rename column to:');
+
+    // Continue internally by passing the new name and current one.
+    if (newname) process(newname, d);
+});
+```
+
+* `deleteprompt`: Column is about to be deleted. Useful for passing in a custom workflow for delete confirmation to override the default one. usage:
+
+``` js
+.on('deleteprompt', function(d, process) {
+    // Prevent the default prompt.
+    this.preventprompt('delete');
+
+    // Do it your own way
+    if (confirm('Are you sure you want to delete ' + d + '?')) process(d);
+});
+```
