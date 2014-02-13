@@ -106,8 +106,7 @@ function metatable() {
 
                 td.enter()
                     .append('td')
-                    .append('input')
-                    .attr('type', 'text')
+                    .append('textarea')
                     .attr('field', String);
 
                 td.exit().remove();
@@ -126,7 +125,7 @@ function metatable() {
 
                 function completeDelete(name) {
                     keyset.remove(name);
-                    tr.selectAll('input')
+                    tr.selectAll('textarea')
                         .data(function(d, i) {
                             var map = d3.map(d);
                             map.remove(name);
@@ -157,7 +156,7 @@ function metatable() {
                 function completeRename(value, name) {
                     keyset.add(value);
                     keyset.remove(name);
-                    tr.selectAll('input')
+                    tr.selectAll('textarea')
                         .data(function(d, i) {
                             var map = d3.map(d);
                             map.set(value, map.get(name));
@@ -191,7 +190,7 @@ function metatable() {
                         }, {});
                 }
 
-                tr.selectAll('input')
+                tr.selectAll('textarea')
                     .data(function(d, i) {
                         return d3.range(keys.length).map(function() {
                             return {
