@@ -45,8 +45,7 @@ function metatable(options) {
                 var controls = sel.selectAll('.controls')
                     .data([d])
                     .enter()
-                    .append('div')
-                    .attr('class', 'controls space-bottom');
+                    .append('div');
 
                 if (!config.newCol) {
                     var colbutton = controls.append('a')
