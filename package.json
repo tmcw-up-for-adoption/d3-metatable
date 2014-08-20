@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/tmcw/d3-metatable.git"
+    "url": "git://github.com/mapbox/d3-metatable.git"
   },
   "keywords": [
     "table",
@@ -19,6 +19,6 @@
   "author": "Tom MacWright",
   "license": "BSD",
   "bugs": {
-    "url": "https://github.com/tmcw/d3-metatable/issues"
+    "url": "https://github.com/mapbox/d3-metatable/issues"
   }
 }
