@@ -3,7 +3,7 @@
 A table view component for [d3js](http://d3js.org/) designed for JSON
 objects of varying schemas.
 
-### example
+### Example
 
 ```js
 container.append('div')
@@ -18,11 +18,19 @@ container.append('div')
             })
 ```
 
-### api
+### API
 
 ```js
-metatable()
+metatable(options);
 ```
+
+The `options` param should be an object and is optional.
+
+| property | default | description |
+| ---- | ---- | ---- |
+| newCol | true | Add's a link to add a new column to a table. |
+| deleteCol | true | Add's a link to rename a column in a table. |
+| renameCol | true | Add's a link to delete a column in a table. |
 
 A behavior that expects to be called with a selection an array of objects
 of data. Emits events:
