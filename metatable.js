@@ -119,8 +119,8 @@ function metatable(options) {
 
                 td.enter()
                     .append('td')
-                    .append('input')
-                    .attr('type', 'text')
+                    .append('div')
+                    .attr('contenteditable', 'true')
                     .attr('field', String);
 
                 td.exit().remove();
@@ -136,7 +136,7 @@ function metatable(options) {
 
                 function completeDelete(name) {
                     keyset.remove(name);
-                    tr.selectAll('input')
+                    tr.selectAll('div')
                         .data(function(d, i) {
                             var map = d3.map(d);
                             map.remove(name);
@@ -167,7 +167,7 @@ function metatable(options) {
                 function completeRename(value, name) {
                     keyset.add(value);
                     keyset.remove(name);
-                    tr.selectAll('input')
+                    tr.selectAll('div')
                         .data(function(d, i) {
                             var map = d3.map(d);
                             map.set(value, map.get(name));
@@ -189,7 +189,12 @@ function metatable(options) {
                 }
 
                 function write(d) {
-                    d.data[d3.select(this).attr('field')] = coerceNum(this.value);
+                    var value = this.innerHTML
+                                .replace(/<(br|div|p)\/?>/gi,"\n") // Retain line breaks
+                                .replace(/(<([^>]+)>)/gi, "") // Remove other HTML
+                                .replace(/&gt;/gi, '>') // Un-escape escaped HTML
+                                .replace(/&lt;/gi, '<');
+                    d.data[d3.select(this).attr('field')] = coerceNum(value);
                     event.change(d.data, d.index);
                 }
 
@@ -201,7 +206,13 @@ function metatable(options) {
                         }, {});
                 }
 
-                tr.selectAll('input')
+                function escapeHtml(str) {
+                    var div = document.createElement('div');
+                    div.appendChild(document.createTextNode(str));
+                    return div.innerHTML;
+                }
+
+                tr.selectAll('div')
                     .data(function(d, i) {
                         return d3.range(keys.length).map(function() {
                             return {
@@ -213,8 +224,10 @@ function metatable(options) {
                     .classed('disabled', function(d) {
                         return d.data[d3.select(this).attr('field')] === undefined;
                     })
-                    .property('value', function(d) {
+                    .html(function(d) {
                         var value = d.data[d3.select(this).attr('field')];
+                        if (value) value = escapeHtml(value);
+                        if (typeof value === 'string') value = value.replace("\n", '<br/>');
                         return !isNaN(value) ? value : value || '';
                     })
                     .on('keyup', write)
