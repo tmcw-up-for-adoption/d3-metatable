@@ -4,6 +4,11 @@
 <meta charset=utf-8 />
 <meta name='viewport' content='initial-scale=1.0 maximum-scale=1.0'>
 <link href='//www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+<style>
+textarea {
+  white-space: nowrap;
+}
+</style>
 <title>d3-metatable | MapBox</title>
 </head>
 <body>
@@ -24,11 +29,12 @@
           data.push({
               v1: Math.random(),
               v2: 'foo',
-              v3: 'foo bar' + Math.random()
+              v3: 'foo bar' + Math.random(),
+              v4: 'foo\nbar'
           });
       } else if (Math.random() > 0.5) {
           data.push({
-              v2: 'foo',
+              v2: '<b>foo</b>',
               v3: 'foo bar' + Math.random(),
               v4: 'foo bar' + Math.random()
           });
