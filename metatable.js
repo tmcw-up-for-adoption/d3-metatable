@@ -8,6 +8,8 @@ function metatable(options) {
     var event = d3.dispatch('change', 'rowfocus', 'renameprompt', 'deleteprompt', 'preventprompt');
     var _renamePrompt, _deletePrompt;
 
+    options = options || {};
+
     var config = {
         newCol: options.newCol || true,
         renameCol: options.renameCol || true,
