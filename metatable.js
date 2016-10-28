@@ -11,9 +11,9 @@ function metatable(options) {
     options = options || {};
 
     var config = {
-        newCol: options.hasOwnProperty('newCol') ? options.newCol : true,
-        renameCol: options.hasOwnProperty('renameCol') ? options.renameCol : true,
-        deleteCol: options.hasOwnProperty('deleteCol') ? options.deleteCol : true
+        newCol: options.newCol !== false,
+        renameCol: options.renameCol !== false,
+        deleteCol: options.deleteCol !== false
     };
 
     function table(selection) {
