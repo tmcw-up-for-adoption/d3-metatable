@@ -11,9 +11,9 @@ function metatable(options) {
     options = options || {};
 
     var config = {
-        newCol: options.newCol || true,
-        renameCol: options.renameCol || true,
-        deleteCol: options.deleteCol || true
+        newCol: options.hasOwnProperty('newCol') ? options.newCol : true,
+        renameCol: options.hasOwnProperty('renameCol') ? options.renameCol : true,
+        deleteCol: options.hasOwnProperty('deleteCol') ? options.deleteCol : true
     };
 
     function table(selection) {
@@ -49,7 +49,7 @@ function metatable(options) {
                     .enter()
                     .append('div');
 
-                if (!config.newCol) {
+                if (config.newCol) {
                     var colbutton = controls.append('a')
                         .text('New column')
                         .attr('href', '#')
@@ -90,7 +90,7 @@ function metatable(options) {
                     .append('div')
                     .attr('class', 'small');
 
-                if (!config.deleteCol) {
+                if (config.deleteCol) {
                     var delbutton = actionLinks
                         .append('a')
                         .attr('href', '#')
@@ -99,7 +99,7 @@ function metatable(options) {
                         .on('click', deleteClick);
                 }
 
-                if (!config.renameCol) {
+                if (config.renameCol) {
                     var renamebutton = actionLinks
                         .append('a')
                         .attr('href', '#')
