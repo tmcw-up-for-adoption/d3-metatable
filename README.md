@@ -28,9 +28,9 @@ The `options` param should be an object and is optional.
 
 | property | default | description |
 | ---- | ---- | ---- |
-| newCol | true | Add's a link to add a new column to a table. |
-| deleteCol | true | Add's a link to rename a column in a table. |
-| renameCol | true | Add's a link to delete a column in a table. |
+| newCol | true | Adds a link to add a new column to a table. |
+| deleteCol | true | Adds a link to rename a column in a table. |
+| renameCol | true | Adds a link to delete a column in a table. |
 
 A behavior that expects to be called with a selection an array of objects
 of data. Emits events:
