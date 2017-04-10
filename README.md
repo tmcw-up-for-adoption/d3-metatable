@@ -1,5 +1,7 @@
 ## d3-metatable
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/tmcw/d3-metatable.svg)](https://greenkeeper.io/)
+
 A table view component for [d3js](http://d3js.org/) designed for JSON
 objects of varying schemas.
 
