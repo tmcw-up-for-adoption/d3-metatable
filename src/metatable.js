@@ -46,10 +46,12 @@ export default function (options) {
 
             function bootstrap() {
 
-                var controls = sel.selectAll('.controls')
+                var controls = sel
+                    .selectAll('.controls')
                     .data([d])
                     .enter()
-                    .append('div');
+                    .append('div')
+                    .attr('class', 'controls');
 
                 if (config.newCol) {
                     controls.append('a')
