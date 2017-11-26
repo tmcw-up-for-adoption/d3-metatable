@@ -5,7 +5,8 @@ import {map, set} from 'd3-collection';
 
 export default function (options) {
     var dispatcher = dispatch('change', 'rowfocus', 'renameprompt', 'deleteprompt');
-    var _renamePrompt, _deletePrompt;
+    var _renamePrompt = true;
+    var _deletePrompt = true;
 
     options = options || {};
 
@@ -27,16 +28,18 @@ export default function (options) {
                 });
             });
 
+            var keys = keyset.values();
+
             bootstrap();
             paint();
 
             dispatcher.preventprompt = function(which) {
                 switch(which) {
                     case 'rename':
-                        _renamePrompt = true;
+                        _renamePrompt = false;
                     break;
                     case 'delete':
-                        _deletePrompt = true;
+                        _deletePrompt = false;
                     break;
                 }
             };
@@ -72,8 +75,6 @@ export default function (options) {
             }
 
             function paint() {
-
-                var keys = keyset.values();
 
                 var th = table
                     .select('thead')
@@ -130,13 +131,14 @@ export default function (options) {
                     event.preventDefault();
                     var name = d;
                     dispatcher.call('deleteprompt', dispatcher, d, completeDelete);
-                    if (_deletePrompt || confirm('Delete column ' + name + '?')) {
+                    if (_deletePrompt && confirm('Delete column ' + name + '?')) {
                         completeDelete(d);
                     }
+                    _deletePrompt = true;
                 }
 
                 function completeDelete(name) {
-                    keyset.remove(name);
+                    keys.splice(keys.indexOf(name), 1);
                     tr.selectAll('textarea')
                         .data(function(d, i) {
                             var m = map(d);
@@ -157,17 +159,18 @@ export default function (options) {
                     dispatcher.call('renameprompt', dispatcher, d, completeRename);
 
                     var newname = (_renamePrompt) ?
-                        undefined :
-                        prompt('New name for column ' + name + '?');
+                        prompt('New name for column ' + name + '?') :
+                        undefined;
 
-                    if (_renamePrompt || newname) {
+                    if (_renamePrompt && newname) {
                         completeRename(newname, name);
                     }
+
+                    _renamePrompt = true;
                 }
 
                 function completeRename(value, name) {
-                    keyset.add(value);
-                    keyset.remove(name);
+                    keys.splice(keys.indexOf(name), 1, value);
                     tr.selectAll('textarea')
                         .data(function(d, i) {
                             var m = map(d);
