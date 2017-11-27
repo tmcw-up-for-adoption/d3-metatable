@@ -1,10 +1,4 @@
-if (typeof module !== 'undefined') {
-    module.exports = function(d3) {
-        return metatable;
-    };
-}
-
-function metatable(options) {
+export default function (options) {
     var event = d3.dispatch('change', 'rowfocus', 'renameprompt', 'deleteprompt', 'preventprompt');
     var _renamePrompt, _deletePrompt;
 
