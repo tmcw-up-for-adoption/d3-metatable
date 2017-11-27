@@ -2,9 +2,12 @@
   "name": "d3-metatable",
   "version": "0.4.0",
   "description": "a table element for heterogenous objects",
-  "main": "metatable.js",
+  "main": "build/d3-metatable.js",
+  "jsnext:main": "index",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pretest": "rm -rf build && mkdir build && rollup -c",
+    "test": "tape 'test/**/*-test.js'",
+    "prepare": "npm run test && uglifyjs -b beautify=false build/d3-metatable.js -c -m -o build/d3-metatable.min.js"
   },
   "repository": {
     "type": "git",
@@ -13,6 +16,7 @@
   "keywords": [
     "table",
     "d3",
+    "d3-module",
     "component",
     "client"
   ],
@@ -20,5 +24,16 @@
   "license": "BSD",
   "bugs": {
     "url": "https://github.com/mapbox/d3-metatable/issues"
+  },
+  "dependencies": {
+    "d3-array": "^1.2.1",
+    "d3-collection": "^1.0.4",
+    "d3-dispatch": "^1.0.3",
+    "d3-selection": "^1.2.0"
+  },
+  "devDependencies": {
+    "rollup": "^0.52.0",
+    "tape": "^4.8.0",
+    "uglify-js": "^3.2.0"
   }
 }
