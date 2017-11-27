@@ -7,6 +7,7 @@
   "scripts": {
     "pretest": "rm -rf build && mkdir build && rollup -c",
     "test": "tape 'test/**/*-test.js'",
+    "release": "standard-version",
     "prepare": "npm run test && uglifyjs -b beautify=false build/d3-metatable.js -c -m -o build/d3-metatable.min.js"
   },
   "repository": {
