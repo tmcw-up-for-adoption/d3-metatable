@@ -1,5 +1,10 @@
+import {select, event} from 'd3-selection';
+import {dispatch} from 'd3-dispatch';
+import {range} from 'd3-array';
+import {map, set} from 'd3-collection';
+
 export default function (options) {
-    var event = d3.dispatch('change', 'rowfocus', 'renameprompt', 'deleteprompt', 'preventprompt');
+    var dispatcher = dispatch('change', 'rowfocus', 'renameprompt', 'deleteprompt');
     var _renamePrompt, _deletePrompt;
 
     options = options || {};
@@ -12,10 +17,10 @@ export default function (options) {
 
     function table(selection) {
         selection.each(function(d) {
-            var sel = d3.select(this),
+            var sel = select(this),
                 table;
 
-            var keyset = d3.set();
+            var keyset = set();
             d.map(Object.keys).forEach(function(k) {
                 k.forEach(function(_) {
                     keyset.add(_);
@@ -25,7 +30,7 @@ export default function (options) {
             bootstrap();
             paint();
 
-            event.preventprompt = function(which) {
+            dispatcher.preventprompt = function(which) {
                 switch(which) {
                     case 'rename':
                         _renamePrompt = true;
@@ -44,12 +49,12 @@ export default function (options) {
                     .append('div');
 
                 if (config.newCol) {
-                    var colbutton = controls.append('a')
+                    controls.append('a')
                         .text('New column')
                         .attr('href', '#')
                         .attr('class', 'button icon plus')
                         .on('click', function() {
-                            d3.event.preventDefault();
+                            event.preventDefault();
                             var name = prompt('column name');
                             if (name) {
                                 keyset.add(name);
@@ -76,6 +81,8 @@ export default function (options) {
                     .selectAll('th')
                     .data(keys, function(d) { return d; });
 
+                th.exit().remove();
+
                 var thEnter = th.enter()
                     .append('th')
                     .text(String);
@@ -85,7 +92,7 @@ export default function (options) {
                     .attr('class', 'small');
 
                 if (config.deleteCol) {
-                    var delbutton = actionLinks
+                    actionLinks
                         .append('a')
                         .attr('href', '#')
                         .attr('class', 'icon trash')
@@ -94,7 +101,7 @@ export default function (options) {
                 }
 
                 if (config.renameCol) {
-                    var renamebutton = actionLinks
+                    actionLinks
                         .append('a')
                         .attr('href', '#')
                         .attr('class', 'icon pencil')
@@ -102,28 +109,27 @@ export default function (options) {
                         .on('click', renameClick);
                 }
 
-                th.exit().remove();
-
                 var tr = table.select('tbody').selectAll('tr')
                     .data(function(d) { return d; });
 
-                tr.enter().append('tr');
                 tr.exit().remove();
+
+                tr = tr.enter().append('tr').merge(tr);
 
                 var td = tr.selectAll('td')
                     .data(keys, function(d) { return d; });
+
+                td.exit().remove();
 
                 td.enter()
                     .append('td')
                     .append('textarea')
                     .attr('field', String);
 
-                td.exit().remove();
-
                 function deleteClick(d) {
-                    d3.event.preventDefault();
+                    event.preventDefault();
                     var name = d;
-                    event.deleteprompt(d, completeDelete);
+                    dispatcher.call('deleteprompt', dispatcher, d, completeDelete);
                     if (_deletePrompt || confirm('Delete column ' + name + '?')) {
                         completeDelete(d);
                     }
@@ -133,10 +139,10 @@ export default function (options) {
                     keyset.remove(name);
                     tr.selectAll('textarea')
                         .data(function(d, i) {
-                            var map = d3.map(d);
-                            map.remove(name);
-                            var reduced = mapToObject(map);
-                            event.change(reduced, i);
+                            var m = map(d);
+                            m.remove(name);
+                            var reduced = mapToObject(m);
+                            dispatcher.call('change', dispatcher, reduced, i);
                             return {
                                 data: reduced,
                                 index: i
@@ -146,9 +152,9 @@ export default function (options) {
                 }
 
                 function renameClick(d) {
-                    d3.event.preventDefault();
+                    event.preventDefault();
                     var name = d;
-                    event.renameprompt(d, completeRename);
+                    dispatcher.call('renameprompt', dispatcher, d, completeRename);
 
                     var newname = (_renamePrompt) ?
                         undefined :
@@ -164,11 +170,11 @@ export default function (options) {
                     keyset.remove(name);
                     tr.selectAll('textarea')
                         .data(function(d, i) {
-                            var map = d3.map(d);
-                            map.set(value, map.get(name));
-                            map.remove(name);
-                            var reduced = mapToObject(map);
-                            event.change(reduced, i);
+                            var m = map(d);
+                            m.set(value, m.get(name));
+                            m.remove(name);
+                            var reduced = mapToObject(m);
+                            dispatcher.call('change', dispatcher, reduced, i);
                             return {
                                 data: reduced,
                                 index: i
@@ -184,12 +190,12 @@ export default function (options) {
                 }
 
                 function write(d) {
-                    d.data[d3.select(this).attr('field')] = coerceNum(this.value);
-                    event.change(d.data, d.index);
+                    d.data[select(this).attr('field')] = coerceNum(this.value);
+                    dispatcher.call('change', dispatcher, d.data, d.index);
                 }
 
-                function mapToObject(map) {
-                    return map.entries()
+                function mapToObject(m) {
+                    return m.entries()
                         .reduce(function(memo, d) {
                             memo[d.key] = d.value;
                             return memo;
@@ -198,7 +204,7 @@ export default function (options) {
 
                 tr.selectAll('textarea')
                     .data(function(d, i) {
-                        return d3.range(keys.length).map(function() {
+                        return range(keys.length).map(function() {
                             return {
                                 data: d,
                                 index: i
@@ -206,26 +212,31 @@ export default function (options) {
                         });
                     })
                     .classed('disabled', function(d) {
-                        return d.data[d3.select(this).attr('field')] === undefined;
+                        return d.data[select(this).attr('field')] === undefined;
                     })
                     .property('value', function(d) {
-                        var value = d.data[d3.select(this).attr('field')];
+                        var value = d.data[select(this).attr('field')];
                         return !isNaN(value) ? value : value || '';
                     })
                     .on('keyup', write)
                     .on('change', write)
                     .on('click', function(d) {
-                        if (d.data[d3.select(this).attr('field')] === undefined) {
-                            d.data[d3.select(this).attr('field')] = '';
+                        if (d.data[select(this).attr('field')] === undefined) {
+                            d.data[select(this).attr('field')] = '';
                             paint();
                         }
                     })
                     .on('focus', function(d) {
-                        event.rowfocus(d.data, d.index);
+                        dispatcher.call('rowfocus', dispatcher, d.data, d.index);
                     });
             }
         });
     }
 
-    return d3.rebind(table, event, 'on');
+    table.on = function () {
+      dispatcher.on.apply(dispatcher, arguments);
+      return table;
+    };
+
+    return table;
 }
