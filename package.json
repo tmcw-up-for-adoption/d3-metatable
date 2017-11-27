@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "rollup": "^0.52.0",
+    "standard-version": "^4.2.0",
     "tape": "^4.8.0",
     "uglify-js": "^3.2.0"
   }
