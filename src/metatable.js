@@ -62,7 +62,7 @@ export default function (options) {
                             event.preventDefault();
                             var name = prompt('column name');
                             if (name) {
-                                keyset.add(name);
+                                keys.push(name);
                                 paint();
                             }
                         });
